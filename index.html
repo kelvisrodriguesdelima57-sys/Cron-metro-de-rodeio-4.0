@@ -2,93 +2,118 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Site em Manutenção</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cronômetro Crescente</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #111;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-
-    .maintenance {
+    body {
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 20px;
-      padding: 20px;
+      height: 100vh;
+      background: #000;
+      font-family: Arial, sans-serif;
+      margin: 0;
     }
-
-    .maintenance h1 {
-      font-size: 48px;
-      color: #ff5555;
+    .cronometro {
+      background: #111;
+      border-radius: 12px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255,0,0,0.3);
     }
-
-    .maintenance p {
-      font-size: 20px;
-      color: #ccc;
-      max-width: 400px;
+    .display {
+      font-size: 9rem;
+      color: red;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 20px 0;
+      letter-spacing: 5px;
+      min-width: 300px;
     }
-
-    .icon {
-      font-size: 80px;
-      animation: pulse 1.5s infinite;
-    }
-
-    .countdown {
-      font-size: 28px;
-      color: #00ffcc;
+    .botoes {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-top: 10px;
     }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+    button {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #444;
+    }
+    .marca {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <div class="maintenance">
-    <div class="icon">⚠️</div>
-    <h1>Site em Manutenção</h1>
-    <p>Desculpe, nosso site está temporariamente indisponível. Estamos trabalhando para melhorar sua experiência. Por favor, volte mais tarde.</p>
-    <div class="countdown" id="countdown"></div>
+
+  <div class="cronometro">
+    <div class="display" id="display">0.0</div>
+    <div class="botoes">
+      <button onclick="iniciar(30)">30 SEG</button>
+      <button onclick="iniciar(8)">8 SEG</button>
+      <button id="pauseBtn" onclick="pausar()">⏸ Pausar</button>
+      <button onclick="reiniciar()">🔄 Reiniciar</button>
+    </div>
+    <div class="marca">BITMÍDIA PAINÉIS</div>
   </div>
 
   <script>
-    // Defina a data e hora de término da manutenção
-    const maintenanceEnd = new Date();
-    maintenanceEnd.setHours(maintenanceEnd.getHours() + 2); // Exemplo: 2 horas a partir de agora
+    let timer;
+    let tempoAtual = 0;
+    let tempoFinal = 0;
+    let pausado = false;
 
-    const countdownEl = document.getElementById('countdown');
-
-    function updateCountdown() {
-      const now = new Date();
-      const diff = maintenanceEnd - now;
-
-      if (diff <= 0) {
-        countdownEl.innerHTML = "O site já está disponível!";
-        clearInterval(timer);
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      countdownEl.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
+    function atualizarDisplay() {
+      document.getElementById("display").innerText = tempoAtual.toFixed(1);
     }
 
-    updateCountdown(); // Inicializa imediatamente
-    const timer = setInterval(updateCountdown, 1000);
+    function iniciar(segundos) {
+      clearInterval(timer);
+      tempoAtual = 0;
+      tempoFinal = segundos;
+      pausado = false;
+      document.getElementById("pauseBtn").innerText = "⏸ Pausar";
+      atualizarDisplay();
+      timer = setInterval(contar, 100); // a cada 0,1s
+    }
+
+    function contar() {
+      if (!pausado) {
+        tempoAtual += 0.1;
+        if (tempoAtual >= tempoFinal) {
+          clearInterval(timer);
+          tempoAtual = tempoFinal; // garante que não passe do valor
+        }
+        atualizarDisplay();
+      }
+    }
+
+    function pausar() {
+      pausado = !pausado;
+      document.getElementById("pauseBtn").innerText = pausado ? "▶️ Continuar" : "⏸ Pausar";
+    }
+
+    function reiniciar() {
+      clearInterval(timer);
+      tempoAtual = 0;
+      pausado = false;
+      document.getElementById("pauseBtn").innerText = "⏸ Pausar";
+      atualizarDisplay();
+    }
   </script>
+
 </body>
-</html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </body>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </html>
+</html>
