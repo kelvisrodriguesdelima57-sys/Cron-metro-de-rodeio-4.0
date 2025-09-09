@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cronômetro Crescente</title>
+  <title>Cronômetro Crescente com Alerta Sonoro</title>
   <style>
     body {
       display: flex;
@@ -29,6 +29,7 @@
       margin: 20px 0;
       letter-spacing: 5px;
       min-width: 300px;
+      transition: color 0.1s;
     }
     .botoes {
       display: flex;
@@ -70,11 +71,17 @@
     <div class="marca">BITMÍDIA PAINÉIS</div>
   </div>
 
+  <!-- Som de alerta -->
+  <audio id="alertaSom">
+    <source src="https://www.soundjay.com/button/sounds/beep-07.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
     let timer;
     let tempoAtual = 0;
     let tempoFinal = 0;
     let pausado = false;
+    let piscando = false;
 
     function atualizarDisplay() {
       document.getElementById("display").innerText = tempoAtual.toFixed(1);
@@ -85,20 +92,43 @@
       tempoAtual = 0;
       tempoFinal = segundos;
       pausado = false;
+      piscando = false;
       document.getElementById("pauseBtn").innerText = "⏸ Pausar";
+      document.getElementById("display").style.color = "red";
       atualizarDisplay();
-      timer = setInterval(contar, 100); // a cada 0,1s
+      timer = setInterval(contar, 100);
     }
 
     function contar() {
       if (!pausado) {
         tempoAtual += 0.1;
         if (tempoAtual >= tempoFinal) {
-          clearInterval(timer);
-          tempoAtual = tempoFinal; // garante que não passe do valor
+          tempoAtual = tempoFinal;
+          if (!piscando) {
+            clearInterval(timer);
+            iniciarPiscarESom();
+          }
         }
         atualizarDisplay();
       }
+    }
+
+    function iniciarPiscarESom() {
+      piscando = true;
+      // toca o som
+      document.getElementById("alertaSom").play();
+
+      // piscar o display
+      let pisca = true;
+      const piscarInterval = setInterval(() => {
+        document.getElementById("display").style.color = pisca ? "yellow" : "red";
+        pisca = !pisca;
+      }, 200);
+
+      setTimeout(() => {
+        clearInterval(piscarInterval);
+        document.getElementById("display").style.color = "red";
+      }, 3000); // dura 3 segundos
     }
 
     function pausar() {
@@ -110,8 +140,14 @@
       clearInterval(timer);
       tempoAtual = 0;
       pausado = false;
+      piscando = false;
       document.getElementById("pauseBtn").innerText = "⏸ Pausar";
+      document.getElementById("display").style.color = "red";
       atualizarDisplay();
+      // pausa o som se estiver tocando
+      const som = document.getElementById("alertaSom");
+      som.pause();
+      som.currentTime = 0;
     }
   </script>
 
